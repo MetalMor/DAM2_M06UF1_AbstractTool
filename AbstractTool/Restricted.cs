@@ -11,7 +11,7 @@ namespace AbstractTool
     {
         private static string[] _words;
 
-        public static string[] Words
+        internal static string[] Words
         {
             get
             {

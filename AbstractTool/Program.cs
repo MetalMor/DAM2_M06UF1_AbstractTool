@@ -12,9 +12,7 @@ namespace AbstractTool
     {
         static void Main(string[] args)
         {
-            AbstractTool at = new AbstractTool(Variables.DirectoryPath);
-            string[] files = at.Files;
-            foreach (string file in files) AbstractTool.InspectFile(file);
+            new AbstractTool(Variables.DirectoryPath).Inspection();
             Console.ReadKey();
         }
     }

@@ -4,3 +4,6 @@ C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\AbstractTool.pdb
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.csprojResolveAssemblyReference.cache
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.exe
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.pdb
+C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\Tamir.SharpSSH.dll
+C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\Winterdom.IO.FileMap.dll

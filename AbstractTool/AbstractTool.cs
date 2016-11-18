@@ -19,7 +19,13 @@ namespace AbstractTool
             Path = path;
         }
 
-        public static void InspectFile(string path)
+        public void Inspection()
+        {
+            foreach (string filePath in Files)
+                InspectFile(filePath);
+        }
+
+        private static void InspectFile(string path)
         {
             using (var fi = new Files.FileInspector(path))
             {
@@ -39,12 +45,7 @@ namespace AbstractTool
         {
             get
             {
-                if (Directory.Exists(Path)) Console.WriteLine(Variables.FoundFolderMessage);
-                else
-                {
-                    Directory.CreateDirectory(Path);
-                    Console.WriteLine(Variables.CreatedFolderMessage);
-                }
+                Util.CheckDirectory(Path);
                 string[] files = Util.GetFilesInFolder(Path, Variables.AllFilesPattern),
                     exclude = Util.GetFilesInFolder(Path, Variables.InfoFilesPattern);
                 return files.Except(exclude).ToArray();
@@ -105,16 +106,6 @@ namespace AbstractTool
                 char[] delimiterChars = { '\'', ' ', ',', '.', ':', '\n',  };
                 return source.Split(delimiterChars).Where(x => !(string.IsNullOrEmpty(x) || Restricted.Words.Contains(x))).ToArray();
 
-            }
-            private static void CountOccurrences(string[] list, ref Dictionary<string, int> inspection)
-            {
-                string toSet;
-                foreach (string element in list)
-                    if (inspection.ContainsKey(toSet = element) || 
-                        inspection.ContainsKey(toSet = element.Remove(element.Length - 1)) ||
-                        inspection.ContainsKey(toSet = element.Remove(element.Length - 2)))
-                        inspection[toSet]++;
-                    else inspection.Add(element, 1);
             }
 
             public string Path
@@ -184,7 +175,8 @@ namespace AbstractTool
                         using (StreamReader sr = new StreamReader(Path))
                         {
                             string[] wordList = TextToCleanArray(sr.ReadToEnd().ToLower());
-                            CountOccurrences(wordList, ref wordInspection);
+                            Util.CountOccurrences(wordList, ref wordInspection);
+                            Util.SortDictionary(ref wordInspection);
                             return wordInspection;
                         }
                     }
