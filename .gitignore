@@ -1,0 +1,5 @@
+packages/*
+AbstractTools/bin/
+AbstractTools/obj/
+AbstractTools/App
+AbstractTools/packages
