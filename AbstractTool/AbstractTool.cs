@@ -11,7 +11,7 @@ namespace AbstractTool
 {
     class AbstractTool
     {
-        private string _path;
+        private string _path = default(string);
 
         private AbstractTool() { }
         public AbstractTool(string path) : this()
@@ -29,10 +29,9 @@ namespace AbstractTool
         {
             using (var fi = new Files.FileInspector(path))
             {
-                Console.WriteLine(fi.File.Text);
                 Dictionary<string, int> words = fi.Words;
-                foreach (KeyValuePair<string, int> entry in words)
-                    Console.WriteLine(entry.Key + ": " + entry.Value);
+                fi.SaveInfo();
+                Console.WriteLine(Variables.InspectingFileMessage + path.Split(Variables.BackslashChar).Last());
             }
         }
 
@@ -56,7 +55,8 @@ namespace AbstractTool
     { 
         class FileInspector : IDisposable
         {
-            private string _path;
+            private string _path = default(string);
+            private FileData _file = default(FileData);
 
             private FileInspector() { }
             public FileInspector(string path) : this()
@@ -64,14 +64,39 @@ namespace AbstractTool
                 Path = path;
             }
 
+            private void GetProperties(out string output)
+            {
+                string o = string.Empty;
+                o += Variables.FileNameLabel + File.Name + Environment.NewLine;
+                o += Variables.ExtensionLabel + File.Extension + Environment.NewLine;
+                o += Variables.DateLabel + File.Date.ToString(Variables.DateFormatPattern) + Environment.NewLine;
+                o += Variables.WordCountLabel + File.WordCount + Environment.NewLine;
+                o += Variables.AboutLabel + string.Join(Variables.CommaSeparator, File.Inspection.Keys.ToList().GetRange(0, 5));
+                output = o;
+            }
+
             public string Path
             {
                 get { return _path; }
                 set { _path = value; }
             }
+            private string InspectionPath
+            {
+                get
+                {
+                    return File.DirectoryPath + File.Name + Variables.InfoFilesSuffix + Variables.Dot + File.Extension;
+                }
+            }
             public FileData File
             {
-                get { return new FileData(Path); }
+                get {
+                    if (_file == null) _file = new FileData(Path);
+                    return _file;
+                }
+                private set
+                {
+                    _file = value;
+                }
             }
             public Dictionary<string, int> Words
             {
@@ -84,28 +109,38 @@ namespace AbstractTool
             public void Dispose()
             {
                 Path = null;
+                File = null;
                 GC.SuppressFinalize(this);
+            }
+
+            internal void SaveInfo()
+            {
+                try
+                {
+                    string output;
+                    using (StreamWriter sw = new StreamWriter(InspectionPath))
+                    {
+                        GetProperties(out output);
+                        sw.Write(output);
+                    }
+                } catch(IOException ioEx)
+                {
+                    Console.WriteLine(Variables.FileCouldNotBeWrittenMessage);
+                    Console.WriteLine(ioEx.Message);
+                }
             }
         }
         class FileData
         {
-            private string _path;
-            private DateTime _date;
+            private string _path = default(string);
+            private DateTime _date = DateTime.Now;
+            private string _text = default(string);
+            private Dictionary<string, int> _inspection = new Dictionary<string, int>();
 
-            private FileData()
-            {
-                _date = DateTime.Now;
-            }
+            private FileData() { }
             public FileData(string path) : this()
             {
                 Path = path;
-            }
-
-            private static string[] TextToCleanArray(string source)
-            {
-                char[] delimiterChars = { '\'', ' ', ',', '.', ':', '\n',  };
-                return source.Split(delimiterChars).Where(x => !(string.IsNullOrEmpty(x) || Restricted.Words.Contains(x))).ToArray();
-
             }
 
             public string Path
@@ -122,18 +157,18 @@ namespace AbstractTool
                 get
                 {
                     string[] pathArray = PathArray;
-                    return string.Join(Variables.Backslash, pathArray.Take(pathArray.Length - 2));
+                    return string.Join(Variables.Backslash, pathArray.Take(pathArray.Length - 1)) + Variables.Backslash;
                 }
             }
-            public string FileName
+            public string Name
             {
                 get { return FileToArray[0]; }
             }
-            public string FileExtension
+            public string Extension
             {
                 get { return FileToArray[1]; }
             }
-            public string File
+            public string FullName
             {
                 get { return PathArray.Last(); }
             }
@@ -141,24 +176,25 @@ namespace AbstractTool
             {
                 get
                 {
-                    try
+                    if (_text == default(string))
                     {
-                        using (StreamReader sr = new StreamReader(Path))
+                        try
                         {
-                            return sr.ReadToEnd();
+                            _text = File.ReadAllText(Path);
+                        }
+                        catch (IOException ex)
+                        {
+                            Console.WriteLine(Variables.FileCouldNotBeReadMessage);
+                            Console.WriteLine(ex.Message);
+                            _text = Variables.FileCouldNotBeReadError;
                         }
                     }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine(Variables.FileCouldNotBeReadMessage);
-                        Console.WriteLine(ex.Message);
-                        return Variables.FileCouldNotBeReadError;
-                    }
+                    return _text;
                 }
             }
             private string[] FileToArray
             {
-                get { return File.Split('.'); }
+                get { return FullName.Split('.'); }
             }
             public DateTime Date
             {
@@ -169,23 +205,31 @@ namespace AbstractTool
             {
                 get
                 {
-                    Dictionary<string, int> wordInspection = new Dictionary<string, int>();
-                    try
+                    if (_inspection.Count == 0)
                     {
-                        using (StreamReader sr = new StreamReader(Path))
+                        Dictionary<string, int> wordInspection = new Dictionary<string, int>();
+                        try
                         {
-                            string[] wordList = TextToCleanArray(sr.ReadToEnd().ToLower());
+                            string[] wordList = Util.TextToCleanArray(Text.ToLower());
                             Util.CountOccurrences(wordList, ref wordInspection);
                             Util.SortDictionary(ref wordInspection);
-                            return wordInspection;
+                            _inspection =  wordInspection;
+                        }
+                        catch (IOException ex)
+                        {
+                            Console.WriteLine(Variables.FileCouldNotBeReadMessage);
+                            Console.WriteLine(ex.Message);
+                            _inspection = wordInspection;
                         }
                     }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine(Variables.FileCouldNotBeReadMessage);
-                        Console.WriteLine(ex.Message);
-                        return wordInspection;
-                    }
+                    return _inspection;
+                }
+            }
+            public int WordCount
+            {
+                get
+                {
+                    return Util.TextToArray(Text).Length;
                 }
             }
         }

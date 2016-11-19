@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,6 +46,16 @@ namespace AbstractTool
                 Directory.CreateDirectory(path);
                 Console.WriteLine(Variables.CreatedFolderMessage);
             }
+        }
+
+        internal static string[] TextToArray(string source)
+        {
+            return source.Split(Variables.DelimiterChars).Where(x => !(string.IsNullOrEmpty(x))).ToArray();
+        }
+
+        internal static string[] TextToCleanArray(string source)
+        {
+            return source.Split(Variables.DelimiterChars).Where(x => !(string.IsNullOrEmpty(x) || Restricted.Words.Contains(x))).ToArray();
         }
     }
 }
