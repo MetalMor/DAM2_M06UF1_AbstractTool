@@ -61,6 +61,7 @@
     <Compile Include="Restricted.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Variables.cs" />
+    <Compile Include="Xml.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

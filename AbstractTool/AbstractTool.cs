@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace AbstractTool
 {
@@ -49,13 +50,13 @@ namespace AbstractTool
             private void GetProperties(out string output)
             {
                 string o = string.Empty;
-                List<string> keyList = File.Inspection.Keys.ToList();
+                List<string> keyList = FileData.Inspection.Keys.ToList();
                 int numberTop = keyList.Count >= Variables.NumberTopWords ? 
                     Variables.NumberTopWords : keyList.Count;
-                o += Variables.FileNameLabel + File.Name + Environment.NewLine;
-                o += Variables.ExtensionLabel + File.Extension + Environment.NewLine;
-                o += Variables.DateLabel + File.Date.ToString(Variables.DateFormatPattern) + Environment.NewLine;
-                o += Variables.WordCountLabel + File.WordCount + Environment.NewLine;
+                o += Variables.FileNameLabel + FileData.Name + Environment.NewLine;
+                o += Variables.ExtensionLabel + FileData.Extension + Environment.NewLine;
+                o += Variables.DateLabel + FileData.Date.ToString(Variables.DateFormatPattern) + Environment.NewLine;
+                o += Variables.WordCountLabel + FileData.WordCount + Environment.NewLine;
                 o += Variables.AboutLabel + string.Join(Variables.CommaSeparator, keyList.GetRange(0, numberTop));
                 output = o;
             }
@@ -65,14 +66,28 @@ namespace AbstractTool
                 get { return _path; }
                 set { _path = value; }
             }
+            private string DestinationFolder
+            {
+                get
+                {
+                    return FileData.DirectoryPath + FileData.Name + Variables.Backslash;
+                }
+            }
+            private string InfoFileName
+            {
+                get
+                {
+                    return FileData.Name + Variables.InfoFilesSuffix + Variables.Dot + FileData.Extension;
+                }
+            }
             private string InspectionPath
             {
                 get
                 {
-                    return File.DirectoryPath + File.Name + Variables.InfoFilesSuffix + Variables.Dot + File.Extension;
+                    return DestinationFolder + InfoFileName;
                 }
             }
-            public FileData File
+            public FileData FileData
             {
                 get {
                     if (_file == null) _file = new FileData(Path);
@@ -87,14 +102,14 @@ namespace AbstractTool
             {
                 get
                 {
-                    return File.Inspection;
+                    return FileData.Inspection;
                 }
             }
 
             public void Dispose()
             {
                 Path = null;
-                File = null;
+                FileData = null;
                 GC.SuppressFinalize(this);
             }
 
@@ -104,6 +119,8 @@ namespace AbstractTool
                 GetProperties(out output);
                 if(Util.WriteFile(InspectionPath, output))
                 {
+                    string destinationPath = DestinationFolder + FileData.FullName;
+                    if(!File.Exists(destinationPath)) File.Move(Path, DestinationFolder + FileData.FullName);
                     Console.WriteLine(Variables.InspectingFileMessage + Path.Split(Variables.BackslashChar).Last());
                     return true;
                 }
@@ -179,6 +196,7 @@ namespace AbstractTool
                         string[] wordList = Util.TextToCleanArray(Text.ToLower());
                         Util.CountOccurrences(wordList, ref wordInspection);
                         Util.SortDictionary(ref wordInspection);
+                        Xml.WriteXmlWordsFile(Xml.GetFilePath(Name), wordInspection);
                         _inspection =  wordInspection;
                     }
                     return _inspection;

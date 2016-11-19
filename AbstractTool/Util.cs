@@ -89,5 +89,10 @@ namespace AbstractTool
             string[] list = source.Split(Variables.DelimiterChars).Where(x => !string.IsNullOrEmpty(x) && !Restricted.Words.Contains(x)).ToArray();
             return list;
         }
+
+        internal static string GetProgramFilePath(string fileName)
+        {
+            return Variables.DirectoryPath + fileName;
+        }
     }
 }

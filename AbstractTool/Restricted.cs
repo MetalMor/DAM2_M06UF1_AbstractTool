@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-
+﻿
 namespace AbstractTool
 {
     static class Restricted
@@ -16,19 +9,10 @@ namespace AbstractTool
         {
             get
             {
-                if(_words == null) ReadRestrictionsXmlFile();
+                if(_words == null)
+                    AddWords(Xml.ReadXmlWordsFile(Variables.RestrictionsXmlFilePath));
                 return _words;
             }
-        }
-        private static void ReadRestrictionsXmlFile()
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(Variables.RestrictionsXmlFilePath);
-            XmlElement root = doc.DocumentElement;
-            XmlNodeList nodes = root.SelectNodes(Variables.WordElementTagName);
-            List<string> words = new List<String>();
-            foreach (XmlNode node in nodes) words.Add(node.InnerText);
-            AddWords(words.ToArray());
         }
         private static void AddWord(string word)
         {

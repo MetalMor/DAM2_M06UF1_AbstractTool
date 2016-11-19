@@ -11,8 +11,6 @@ namespace AbstractTool
     {
         internal const int NumberTopWords = 5;
 
-        internal const string RestrictionsTxtFileName = "restrictions.txt";
-        internal const string RestrictionsXmlFileName = "restrictions.xml";
         internal const string ProgramFolderName = @"\AbstractTool\";
         internal const string InspectingFileMessage = "File inspected: ";
         internal const string FileNotFoundMessage = "File not found, try again.";
@@ -21,12 +19,15 @@ namespace AbstractTool
 
         internal const string WordListElementTagName = "WordList";
         internal const string WordElementTagName = "Word";
+        internal const string CountAttributeName = "Count";
+        internal const string OccurrencesAttributeName = "Occurrences";
 
         internal const string FileCouldNotBeReadMessage = "File could not be read: ";
         internal const string FileCouldNotBeWrittenMessage = "File could not be written: ";
         internal const string FileCouldNotBeReadError = "ERROR: could not read file";
 
         internal const string TextFileExtension = ".txt";
+        internal const string XmlFileExtension = ".xml";
         internal const string AllFilesPattern = "*";
         internal const string InfoFilesPattern = "*_info";
 
@@ -43,17 +44,24 @@ namespace AbstractTool
         internal const string DateFormatPattern = "yyyy-MM-dd";
         internal const string InfoFilesSuffix = "_info";
         internal const string Dot = ".";
+        internal const string Colon = ":";
         internal const string CommaSeparator = ", ";
 
+        private const string RestrictionsFileName = "restrictions";
+        internal const string DirectoryCreatedMessage = "Created folder";
+
+        internal static string RestrictionsTxtFileName { get { return RestrictionsFileName + TextFileExtension; } }
+        internal static string RestrictionsXmlFileName { get { return RestrictionsFileName + XmlFileExtension; } }
         internal static string DirectoryPath { get { return Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + ProgramFolderName; } }
         internal static string RestrictionsFilePath { get { return DirectoryPath + RestrictionsTxtFileName; } }
-        internal static string CreatedFolderMessage { get { return "Created folder" + PutFilesInFolder; } }
+        internal static string CreatedFolderMessage { get { return DirectoryCreatedMessage + PutFilesInFolder; } }
         internal static string FileNameInputMessage { get { return "Enter the name of a file in " + DirectoryPath + " (leave blank to exit)"; } }
 
         private static string PutFilesInFolder { get { return CommaSeparator + "put txt files inside " + DirectoryPath + ProgramFolderName + Dot; } }
         
         internal static char BackslashChar { get { return GetSingleChar(Backslash); } }
         internal static char VoidSpaceChar { get { return GetSingleChar(VoidSpace); } }
+        internal static char DotChar { get { return GetSingleChar(Dot); } }
 
         internal static char[] DelimiterChars
         {
