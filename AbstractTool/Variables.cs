@@ -9,50 +9,62 @@ namespace AbstractTool
 {
     static class Variables
     {
-        internal static string DirectoryPath
-        { 
-            get
-            {
-                return Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + ProgramFolderName;
-            }
-        }
-        internal static string ProgramFolderName = @"\AbstractTool\";
-        internal static string FolderMessagePost = " folder.";
-        internal static string CreatedFolderMessagePre = "Created";
-        internal static string FoundFolderMessagePre = "Found";
-        private static string PutFilesInFolder = CommaSeparator + "put txt files inside " + DirectoryPath + ProgramFolderName + Dot;
-        internal static string CreatedFolderMessage = CreatedFolderMessagePre + FolderMessagePost + PutFilesInFolder;
-        internal static string FoundFolderMessage = FoundFolderMessagePre + FolderMessagePost;
-        internal static string InspectingFileMessage = "File inspected: ";
+        internal const int NumberTopWords = 5;
 
-        internal static string TextFileExtension = ".txt";
-        internal static string AllFilesPattern = "*";
-        internal static string InfoFilesPattern = "*_info";
+        internal const string RestrictionsTxtFileName = "restrictions.txt";
+        internal const string RestrictionsXmlFileName = "restrictions.xml";
+        internal const string ProgramFolderName = @"\AbstractTool\";
+        internal const string InspectingFileMessage = "File inspected: ";
+        internal const string FileNotFoundMessage = "File not found, try again.";
+        internal const string ExitMessage = "Leaving. Press any key.";
+        internal const string FileNotAllowedMessage = "Only TXT files are allowed.";
 
-        internal static string FileCouldNotBeReadMessage = "File could not be read: ";
-        internal static string FileCouldNotBeWrittenMessage = "File could not be written: ";
-        internal static string FileCouldNotBeReadError = "ERROR: could not read file";
+        internal const string WordListElementTagName = "WordList";
+        internal const string WordElementTagName = "Word";
 
-        internal static string VoidSpace = " ";
-        internal static string RestrictedApostropheL = "l'";
-        internal static string RestrictedApostropheD = "d'";
-        internal static string Backslash = @"\";
-        internal static string PluralEndOfString = "s";
-        internal static string FileNameLabel = "File name: ";
-        internal static string ExtensionLabel = "Extension: ";
-        internal static string DateLabel = "Date: ";
-        internal static string WordCountLabel = "Word count: ";
-        internal static string AboutLabel = "About: ";
-        internal static string DateFormatPattern = "yyyy-MM-dd";
-        internal static string InfoFilesSuffix = "_info";
-        internal static string Dot = ".";
-        internal static string CommaSeparator = ", ";
+        internal const string FileCouldNotBeReadMessage = "File could not be read: ";
+        internal const string FileCouldNotBeWrittenMessage = "File could not be written: ";
+        internal const string FileCouldNotBeReadError = "ERROR: could not read file";
 
+        internal const string TextFileExtension = ".txt";
+        internal const string AllFilesPattern = "*";
+        internal const string InfoFilesPattern = "*_info";
+
+        internal const string VoidSpace = " ";
+        internal const string RestrictedApostropheL = "l'";
+        internal const string RestrictedApostropheD = "d'";
+        internal const string Backslash = @"\";
+        internal const string PluralEndOfString = "s";
+        internal const string FileNameLabel = "File name: ";
+        internal const string ExtensionLabel = "Extension: ";
+        internal const string DateLabel = "Date: ";
+        internal const string WordCountLabel = "Word count: ";
+        internal const string AboutLabel = "About: ";
+        internal const string DateFormatPattern = "yyyy-MM-dd";
+        internal const string InfoFilesSuffix = "_info";
+        internal const string Dot = ".";
+        internal const string CommaSeparator = ", ";
+
+        internal static string DirectoryPath { get { return Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + ProgramFolderName; } }
+        internal static string RestrictionsFilePath { get { return DirectoryPath + RestrictionsTxtFileName; } }
+        internal static string CreatedFolderMessage { get { return "Created folder" + PutFilesInFolder; } }
+        internal static string FileNameInputMessage { get { return "Enter the name of a file in " + DirectoryPath + " (leave blank to exit)"; } }
+
+        private static string PutFilesInFolder { get { return CommaSeparator + "put txt files inside " + DirectoryPath + ProgramFolderName + Dot; } }
+        
         internal static char BackslashChar { get { return GetSingleChar(Backslash); } }
         internal static char VoidSpaceChar { get { return GetSingleChar(VoidSpace); } }
 
+        internal static char[] DelimiterChars
+        {
+            get
+            {
+                char[] dc = { '\'', ' ', ',', '.', ':', '\r', '\n', };
+                return dc;
+            }
+        }
 
-        internal static char[] DelimiterChars = { '\'', ' ', ',', '.', ':', '\r', '\n', };
+        public static string RestrictionsXmlFilePath { get { return DirectoryPath + RestrictionsXmlFileName; } }
 
         private static char GetSingleChar(string str)
         {

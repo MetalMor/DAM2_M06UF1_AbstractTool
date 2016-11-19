@@ -40,12 +40,43 @@ namespace AbstractTool
 
         internal static void CheckDirectory(string path)
         {
-            if (Directory.Exists(path)) Console.WriteLine(Variables.FoundFolderMessage);
-            else
+            if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
                 Console.WriteLine(Variables.CreatedFolderMessage);
             }
+        }
+
+        internal static bool ReadFile(string path, out string output)
+        {
+            try
+            {
+                using (StreamReader sr = new StreamReader(path))
+                    output = sr.ReadToEnd();
+            } catch(IOException ioEx)
+            {
+                Console.WriteLine(Variables.FileCouldNotBeReadMessage);
+                Console.WriteLine(ioEx.Message);
+                output = null;
+            }
+            return output != null;
+        }
+
+        internal static bool WriteFile(string path, string input)
+        {
+            bool ok = false;
+            try
+            {
+                string output;
+                using (StreamWriter sw = new StreamWriter(path))
+                    sw.Write(input);
+                ok = ReadFile(path, out output) && output.Equals(input);
+            } catch(IOException ioEx)
+            {
+                Console.WriteLine(Variables.FileCouldNotBeWrittenMessage);
+                Console.WriteLine(ioEx.Message);
+            }
+            return ok;
         }
 
         internal static string[] TextToArray(string source)
@@ -55,7 +86,8 @@ namespace AbstractTool
 
         internal static string[] TextToCleanArray(string source)
         {
-            return source.Split(Variables.DelimiterChars).Where(x => !(string.IsNullOrEmpty(x) || Restricted.Words.Contains(x))).ToArray();
+            string[] list = source.Split(Variables.DelimiterChars).Where(x => !string.IsNullOrEmpty(x) && !Restricted.Words.Contains(x)).ToArray();
+            return list;
         }
     }
 }

@@ -19,36 +19,21 @@ namespace AbstractTool
             Path = path;
         }
 
-        public void Inspection()
+        public bool Inspect()
         {
-            foreach (string filePath in Files)
-                InspectFile(filePath);
-        }
-
-        private static void InspectFile(string path)
-        {
-            using (var fi = new Files.FileInspector(path))
-            {
-                Dictionary<string, int> words = fi.Words;
-                fi.SaveInfo();
-                Console.WriteLine(Variables.InspectingFileMessage + path.Split(Variables.BackslashChar).Last());
-            }
+            bool ok = false;
+            if (File.Exists(Path)) using (var fi = new Files.FileInspector(Path))
+                {
+                    ok = fi.SaveInfo();
+                    Console.WriteLine(Variables.InspectingFileMessage + Path.Split(Variables.BackslashChar).Last());
+                }
+            return ok;
         }
 
         public string Path
         {
             get { return _path; }
             set { _path = value; }
-        }
-        public string[] Files
-        {
-            get
-            {
-                Util.CheckDirectory(Path);
-                string[] files = Util.GetFilesInFolder(Path, Variables.AllFilesPattern),
-                    exclude = Util.GetFilesInFolder(Path, Variables.InfoFilesPattern);
-                return files.Except(exclude).ToArray();
-            }
         }
     }
     namespace Files
@@ -67,11 +52,14 @@ namespace AbstractTool
             private void GetProperties(out string output)
             {
                 string o = string.Empty;
+                List<string> keyList = File.Inspection.Keys.ToList();
+                int numberTop = keyList.Count >= Variables.NumberTopWords ? 
+                    Variables.NumberTopWords : keyList.Count;
                 o += Variables.FileNameLabel + File.Name + Environment.NewLine;
                 o += Variables.ExtensionLabel + File.Extension + Environment.NewLine;
                 o += Variables.DateLabel + File.Date.ToString(Variables.DateFormatPattern) + Environment.NewLine;
                 o += Variables.WordCountLabel + File.WordCount + Environment.NewLine;
-                o += Variables.AboutLabel + string.Join(Variables.CommaSeparator, File.Inspection.Keys.ToList().GetRange(0, 5));
+                o += Variables.AboutLabel + string.Join(Variables.CommaSeparator, keyList.GetRange(0, numberTop));
                 output = o;
             }
 
@@ -113,21 +101,11 @@ namespace AbstractTool
                 GC.SuppressFinalize(this);
             }
 
-            internal void SaveInfo()
+            internal bool SaveInfo()
             {
-                try
-                {
-                    string output;
-                    using (StreamWriter sw = new StreamWriter(InspectionPath))
-                    {
-                        GetProperties(out output);
-                        sw.Write(output);
-                    }
-                } catch(IOException ioEx)
-                {
-                    Console.WriteLine(Variables.FileCouldNotBeWrittenMessage);
-                    Console.WriteLine(ioEx.Message);
-                }
+                string output;
+                GetProperties(out output);
+                return Util.WriteFile(InspectionPath, output);
             }
         }
         class FileData
@@ -176,19 +154,7 @@ namespace AbstractTool
             {
                 get
                 {
-                    if (_text == default(string))
-                    {
-                        try
-                        {
-                            _text = File.ReadAllText(Path);
-                        }
-                        catch (IOException ex)
-                        {
-                            Console.WriteLine(Variables.FileCouldNotBeReadMessage);
-                            Console.WriteLine(ex.Message);
-                            _text = Variables.FileCouldNotBeReadError;
-                        }
-                    }
+                    if (_text == default(string)) Util.ReadFile(Path, out _text);
                     return _text;
                 }
             }
@@ -208,19 +174,10 @@ namespace AbstractTool
                     if (_inspection.Count == 0)
                     {
                         Dictionary<string, int> wordInspection = new Dictionary<string, int>();
-                        try
-                        {
-                            string[] wordList = Util.TextToCleanArray(Text.ToLower());
-                            Util.CountOccurrences(wordList, ref wordInspection);
-                            Util.SortDictionary(ref wordInspection);
-                            _inspection =  wordInspection;
-                        }
-                        catch (IOException ex)
-                        {
-                            Console.WriteLine(Variables.FileCouldNotBeReadMessage);
-                            Console.WriteLine(ex.Message);
-                            _inspection = wordInspection;
-                        }
+                        string[] wordList = Util.TextToCleanArray(Text.ToLower());
+                        Util.CountOccurrences(wordList, ref wordInspection);
+                        Util.SortDictionary(ref wordInspection);
+                        _inspection =  wordInspection;
                     }
                     return _inspection;
                 }
