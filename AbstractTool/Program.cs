@@ -20,26 +20,26 @@ namespace AbstractTool
     {
         internal static void Run()
         {
-            string path, input;
+            string fileName, input;
             AbstractTool at;
             Util.CheckDirectory(Variables.DirectoryPath);
             Console.WriteLine(Variables.FileNameInputMessage);
             do
             {
                 input = Console.ReadLine();
-                path = Variables.DirectoryPath + input;
-                at = new AbstractTool(path);
+                fileName = input;
+                at = new AbstractTool(fileName);
 
                 if (input == string.Empty) Console.WriteLine(Variables.ExitMessage);
 
                 if (input.IndexOf(Variables.TextFileExtension) < 0)
                     if (input.IndexOf(Variables.Dot) < 0)
                     {
-                        path += Variables.TextFileExtension;
-                        if(File.Exists(path)) at = new AbstractTool(path);
+                        fileName += Variables.TextFileExtension;
+                        if(File.Exists(fileName)) at = new AbstractTool(fileName);
                     }
                     else Console.WriteLine(Variables.FileNotAllowedMessage);
-                else if (File.Exists(path)) at = new AbstractTool(path);
+                else if (File.Exists(fileName)) at = new AbstractTool(fileName);
                 else Console.WriteLine(Variables.FileNotFoundMessage);
 
                 if (at != null) at.Inspect();

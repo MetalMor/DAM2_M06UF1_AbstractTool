@@ -14,20 +14,17 @@ namespace AbstractTool
         private string _path = default(string);
 
         private AbstractTool() { }
-        public AbstractTool(string path) : this()
+        public AbstractTool(string fileName) : this()
         {
-            Path = path;
+            Path = Variables.DirectoryPath + fileName;
         }
 
         public bool Inspect()
         {
-            bool ok = false;
-            if (File.Exists(Path)) using (var fi = new Files.FileInspector(Path))
-                {
-                    ok = fi.SaveInfo();
-                    Console.WriteLine(Variables.InspectingFileMessage + Path.Split(Variables.BackslashChar).Last());
-                }
-            return ok;
+            if (File.Exists(Path))
+                using (var fi = new Files.FileInspector(Path))
+                    return fi.SaveInfo();
+            return false;
         }
 
         public string Path
@@ -105,7 +102,12 @@ namespace AbstractTool
             {
                 string output;
                 GetProperties(out output);
-                return Util.WriteFile(InspectionPath, output);
+                if(Util.WriteFile(InspectionPath, output))
+                {
+                    Console.WriteLine(Variables.InspectingFileMessage + Path.Split(Variables.BackslashChar).Last());
+                    return true;
+                }
+                return false;
             }
         }
         class FileData
