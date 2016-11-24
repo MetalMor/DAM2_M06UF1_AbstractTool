@@ -28,6 +28,14 @@ namespace AbstractTool
             return false;
         }
 
+        public bool Censore()
+        {
+            if (File.Exists(Path))
+                using (var fc = new Files.FileCensorer(Path))
+                    return fc.Censor();
+            return false;
+        }
+
         public string Path
         {
             get { return _path; }
@@ -36,16 +44,84 @@ namespace AbstractTool
     }
     namespace Files
     { 
-        class FileInspector : IDisposable
+        abstract class FileProcessor : IDisposable
         {
             private string _path = default(string);
-            private FileData _file = default(FileData);
 
-            private FileInspector() { }
-            public FileInspector(string path) : this()
+            protected FileProcessor() { }
+            protected FileProcessor(string path)
             {
                 Path = path;
             }
+
+            public void Dispose()
+            {
+                Path = null;
+                GC.SuppressFinalize(this);
+            }
+
+            public string Path
+            {
+                get { return _path; }
+                set { _path = value; }
+            }
+        }
+        class FileCensorer : FileProcessor, IDisposable
+        {
+            public FileCensorer(): base() { }
+            public FileCensorer(string path): base(path) { }
+
+            private string[] GetCensoredWords()
+            {
+                string data;
+                bool ok = Util.ReadFile(Variables.CensoredWordsTxtFileName, out data);
+                if (ok) return Regex.Split(data, Environment.NewLine);
+                return new string[0];
+            }
+
+            public bool Censor()
+            {
+                string[] censoredWords = GetCensoredWords();
+                string text;
+                bool ok = Util.ReadFile(Path, out text);
+                if (ok) 
+                    foreach (string word in censoredWords)
+                        text = text.Replace(word, Variables.CensoredWord);
+                if (Util.WriteFile(CensoredFilePath, text))
+                {
+                    int lastBackslashIndex = Path.LastIndexOf(Variables.Backslash);
+                    string fileName = Path.Substring(lastBackslashIndex, Path.LastIndexOf(Variables.Dot) - lastBackslashIndex);
+                    string destinationFolder = Path.Substring(0, lastBackslashIndex);
+                    string destinationPath = destinationFolder + fileName
+                        + Variables.CensoredFileNameSuffix + Variables.TextFileExtension;
+                    if (!File.Exists(destinationPath)) File.Move(Path, destinationFolder + fileName
+                        + Variables.CensoredFileNameSuffix + Variables.TextFileExtension);
+                    Console.WriteLine(Variables.CensoringFileMessage + Path.Split(Variables.BackslashChar).Last());
+                    return true;
+                }
+                return ok;
+            } 
+
+            public new void Dispose()
+            {
+                base.Dispose();
+            }
+
+            private string CensoredFilePath
+            {
+                get
+                {
+
+                    return Path.Substring(0, Path.LastIndexOf(Variables.DotChar)) + Variables.CensoredFileNameSuffix + Variables.TextFileExtension;
+                }
+            }
+        }
+        class FileInspector : FileProcessor, IDisposable
+        {
+            private FileData _file = default(FileData);
+
+            private FileInspector(): base() { }
+            public FileInspector(string path) : base(path) { }
 
             private void GetProperties(out string output)
             {
@@ -60,12 +136,7 @@ namespace AbstractTool
                 o += Variables.AboutLabel + string.Join(Variables.CommaSeparator, keyList.GetRange(0, numberTop));
                 output = o;
             }
-
-            public string Path
-            {
-                get { return _path; }
-                set { _path = value; }
-            }
+            
             private string DestinationFolder
             {
                 get
@@ -106,9 +177,9 @@ namespace AbstractTool
                 }
             }
 
-            public void Dispose()
+            public new void Dispose()
             {
-                Path = null;
+                base.Dispose();
                 FileData = null;
                 GC.SuppressFinalize(this);
             }

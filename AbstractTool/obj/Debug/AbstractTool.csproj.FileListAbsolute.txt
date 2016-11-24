@@ -1,7 +1,6 @@
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\AbstractTool.exe.config
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\AbstractTool.exe
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\AbstractTool.pdb
-C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.csprojResolveAssemblyReference.cache
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.exe
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\obj\Debug\AbstractTool.pdb
 C:\Users\Mor\Cole\m06\uf1\Pràctica\AbstractTool\bin\Debug\ICSharpCode.SharpZipLib.dll

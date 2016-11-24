@@ -11,11 +11,19 @@ namespace AbstractTool
     {
         internal const int NumberTopWords = 5;
 
+        internal const string CensoredWordsFileName = "tabooWords" + TextFileExtension;
         internal const string ProgramFolderName = @"\AbstractTool\";
+        internal const string CensoredFileNameSuffix = "_out";
         internal const string InspectingFileMessage = "File inspected: ";
         internal const string FileNotFoundMessage = "File not found, try again.";
         internal const string ExitMessage = "Leaving. Press any key.";
         internal const string FileNotAllowedMessage = "Only TXT files are allowed.";
+        internal const string ActionToPerform = "Tell me an action: inspect or censor";
+        internal const string ActionOk = "Ok.";
+        internal const string ActionKo = "Error, wrong action";
+
+        internal const string ActionInspect = "inspect";
+        internal const string ActionCensor = "censor";
 
         internal const string WordListElementTagName = "WordList";
         internal const string WordElementTagName = "Word";
@@ -46,12 +54,19 @@ namespace AbstractTool
         internal const string Dot = ".";
         internal const string Colon = ":";
         internal const string CommaSeparator = ", ";
+        internal const string UnixNewLine = "\n";
 
         private const string RestrictionsFileName = "restrictions";
         internal const string DirectoryCreatedMessage = "Created folder";
+        internal const string CensoredWord = "[CENSORED]";
+        internal const string Slash = "/";
+        internal const string CensoringFileMessage = "Censoring file: ";
+
+        internal static char NewLineChar { get { return Environment.NewLine.ToCharArray()[0]; } }
 
         internal static string RestrictionsTxtFileName { get { return RestrictionsFileName + TextFileExtension; } }
         internal static string RestrictionsXmlFileName { get { return RestrictionsFileName + XmlFileExtension; } }
+        internal static string CensoredWordsTxtFileName { get { return DirectoryPath + CensoredWordsFileName; } }
         internal static string DirectoryPath { get { return Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + ProgramFolderName; } }
         internal static string RestrictionsFilePath { get { return DirectoryPath + RestrictionsTxtFileName; } }
         internal static string CreatedFolderMessage { get { return DirectoryCreatedMessage + PutFilesInFolder; } }
@@ -69,6 +84,14 @@ namespace AbstractTool
             {
                 char[] dc = { '\'', ' ', ',', '.', ':', '\r', '\n', };
                 return dc;
+            }
+        }
+        internal static char[] NewLine
+        {
+            get
+            {
+                char[] nl = { '\r', '\n' };
+                return nl;
             }
         }
 

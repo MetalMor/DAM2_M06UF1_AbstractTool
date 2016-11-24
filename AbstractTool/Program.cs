@@ -21,6 +21,16 @@ namespace AbstractTool
         internal static void Run()
         {
             string fileName, input, path;
+            bool ok;
+            AbstractTool at;
+            string action;
+            do
+            {
+                Console.WriteLine(Variables.ActionToPerform);
+                action = Console.ReadLine().ToLower();
+                ok = action.Equals(Variables.ActionInspect) || action.Equals(Variables.ActionCensor);
+                Console.WriteLine(ok ? Variables.ActionOk : Variables.ActionKo );
+            } while (!ok);
             Util.CheckDirectory(Variables.DirectoryPath);
             Console.WriteLine(Variables.FileNameInputMessage);
             do
@@ -34,7 +44,18 @@ namespace AbstractTool
                         else Console.WriteLine(Variables.FileNotAllowedMessage);
 
                     if (File.Exists(Util.GetProgramFilePath(fileName)))
-                        new AbstractTool(fileName).Inspect();
+                    {
+                        at = new AbstractTool(fileName);
+                        switch(action)
+                        {
+                            case Variables.ActionInspect:
+                                at.Inspect();
+                                break;
+                            case Variables.ActionCensor:
+                                at.Censore();
+                                break;
+                        }
+                    }
                     else Console.WriteLine(Variables.FileNotFoundMessage);
                 }
             }
